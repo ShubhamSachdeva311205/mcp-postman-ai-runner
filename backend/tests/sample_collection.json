@@ -1,0 +1,28 @@
+{
+  "info": {
+    "name": "Sample API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base", "value": "https://jsonplaceholder.typicode.com" }
+  ],
+  "item": [
+    {
+      "name": "Get a todo",
+      "request": { "method": "GET", "header": [], "url": { "raw": "{{base}}/todos/1" } }
+    },
+    {
+      "name": "Missing resource",
+      "request": { "method": "GET", "header": [], "url": { "raw": "{{base}}/nope/404" } }
+    },
+    {
+      "name": "Create a post",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\"title\": \"hello\", \"body\": \"world\", \"userId\": 1}" },
+        "url": { "raw": "{{base}}/posts" }
+      }
+    }
+  ]
+}
