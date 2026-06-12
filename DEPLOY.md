@@ -10,7 +10,8 @@ Frontend → GitHub Pages (static), backend → a free Hugging Face Docker Space
 ## 1. Backend → Hugging Face Space
 
 ```bash
-pip install -U huggingface_hub && huggingface-cli login   # WRITE token
+pip install -U huggingface_hub
+export HF_TOKEN=hf_xxx        # a WRITE token from https://hf.co/settings/tokens
 deploy/deploy_hf.sh bhamdoesweirdstuff mcp-postman-ai-runner
 ```
 
