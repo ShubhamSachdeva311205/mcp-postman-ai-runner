@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MCP Postman AI Runner — Project Guide</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --panel2: #1c2333;
+    --border: #2b3444;
+    --text: #e6edf3;
+    --muted: #9aa7b4;
+    --accent: #6ea8fe;
+    --accent2: #7ee787;
+    --warn: #f0b429;
+    --fail: #ff7b72;
+    --pass: #7ee787;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 32px 24px 96px; }
+  header.hero {
+    background: linear-gradient(135deg, #1a2233 0%, #0d1117 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 32px;
+    margin-bottom: 40px;
+  }
+  header.hero h1 { margin: 0 0 8px; font-size: 2.1rem; }
+  header.hero p { margin: 0; color: var(--muted); font-size: 1.1rem; }
+  .badge {
+    display: inline-block; font-size: .72rem; font-weight: 600;
+    padding: 3px 10px; border-radius: 999px; margin-right: 6px;
+    background: rgba(110,168,254,.15); color: var(--accent); border: 1px solid rgba(110,168,254,.3);
+  }
+  h2 {
+    font-size: 1.5rem; margin: 48px 0 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 { font-size: 1.15rem; margin: 28px 0 8px; color: var(--accent); }
+  p, li { color: var(--text); }
+  .muted { color: var(--muted); }
+  code {
+    background: var(--panel2); padding: 2px 6px; border-radius: 5px;
+    font-family: "SF Mono", Menlo, Consolas, monospace; font-size: .88em; color: #ffd7a8;
+  }
+  pre {
+    background: #0a0e14; border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px 18px; overflow-x: auto; font-size: .85rem; line-height: 1.5;
+  }
+  pre code { background: none; padding: 0; color: #d6deeb; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 24px; margin: 16px 0;
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+  .flow {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    margin: 18px 0; font-size: .9rem;
+  }
+  .flow .step {
+    background: var(--panel2); border: 1px solid var(--border);
+    padding: 10px 14px; border-radius: 10px; text-align: center; flex: 1; min-width: 120px;
+  }
+  .flow .arrow { color: var(--accent); font-size: 1.3rem; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .92rem; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--accent); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  .tag-pass { color: var(--pass); font-weight: 600; }
+  .tag-warn { color: var(--warn); font-weight: 600; }
+  .tag-fail { color: var(--fail); font-weight: 600; }
+  .callout {
+    border-left: 3px solid var(--accent); background: rgba(110,168,254,.07);
+    padding: 12px 18px; border-radius: 0 8px 8px 0; margin: 16px 0;
+  }
+  .callout.good { border-color: var(--accent2); background: rgba(126,231,135,.07); }
+  .callout.warn { border-color: var(--warn); background: rgba(240,180,41,.08); }
+  ul.tight { margin: 8px 0; padding-left: 22px; }
+  ul.tight li { margin: 4px 0; }
+  .toc { columns: 2; column-gap: 32px; font-size: .95rem; }
+  @media (max-width: 640px) { .toc { columns: 1; } }
+  .toc a { color: var(--accent); text-decoration: none; display: block; padding: 3px 0; }
+  .toc a:hover { text-decoration: underline; }
+  .kv { display: grid; grid-template-columns: 160px 1fr; gap: 6px 16px; font-size: .92rem; }
+  .kv div:nth-child(odd) { color: var(--accent); font-weight: 600; }
+  footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--muted); font-size: .85rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div style="margin-bottom:14px">
+      <span class="badge">Python</span>
+      <span class="badge">FastAPI</span>
+      <span class="badge">React</span>
+      <span class="badge">MCP Server</span>
+      <span class="badge">LLM / Ollama</span>
+    </div>
+    <h1>MCP Postman AI Runner</h1>
+    <p>Run Postman API collections, then let an AI grade every response <strong>PASS / WARN / FAIL</strong>.
+    An automated QA engineer for your APIs.</p>
+  </header>
+
+  <div class="card">
+    <strong>What's in this guide</strong>
+    <div class="toc" style="margin-top:10px">
+      <a href="#tldr">1. The 30-second summary</a>
+      <a href="#postman">2. Postman basics (collections, requests)</a>
+      <a href="#what">3. What this project does</a>
+      <a href="#how">4. How it works (the engine)</a>
+      <a href="#mcp">5. What is MCP + how we built our own</a>
+      <a href="#faces">6. The three ways to use it</a>
+      <a href="#diff">7. Old prototype vs this rebuild</a>
+      <a href="#run">8. How to start it</a>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="tldr">1. The 30-second summary</h2>
+  <p>
+    Normally when you test an API in Postman, it only checks the rules <em>you</em> wrote by hand
+    ("status should be 200"). This project adds a second brain: after running every request, it sends
+    the request and response to an <strong>AI model</strong> that reads them like a senior QA engineer would,
+    and flags problems nobody wrote a rule for — leaked secrets, error messages, slow responses,
+    weird/missing fields, and so on.
+  </p>
+  <div class="flow">
+    <div class="step">📁 Postman<br/>collection</div>
+    <div class="arrow">→</div>
+    <div class="step">🐍 Python runner<br/>sends the requests</div>
+    <div class="arrow">→</div>
+    <div class="step">🤖 AI reads each<br/>response</div>
+    <div class="arrow">→</div>
+    <div class="step">📊 PASS / WARN / FAIL<br/>report</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="postman">2. Postman basics (just what you need)</h2>
+  <p>Postman is a popular tool for testing APIs. A few terms your manager might mention:</p>
+  <table>
+    <tr><th>Term</th><th>What it means</th></tr>
+    <tr>
+      <td><strong>Request</strong></td>
+      <td>A single call to an API — e.g. <code>GET https://api.site.com/users</code>. It has a method
+      (GET / POST / …), a URL, headers, and sometimes a body.</td>
+    </tr>
+    <tr>
+      <td><strong>Response</strong></td>
+      <td>What the server sends back: a <strong>status code</strong> (200 = OK, 404 = not found, 500 = server error),
+      headers, and a body (usually JSON).</td>
+    </tr>
+    <tr>
+      <td><strong>Collection</strong></td>
+      <td>A saved <strong>group of requests</strong> bundled into one file (a <code>.json</code> file in
+      "Postman v2.1" format). Think of it as a test suite for an API. This is the file our tool takes as input.</td>
+    </tr>
+    <tr>
+      <td><strong>Variables</strong></td>
+      <td>Placeholders like <code>{{base_url}}</code> or <code>{{token}}</code> written inside requests, so you
+      don't hardcode values. Our runner fills these in before sending.</td>
+    </tr>
+    <tr>
+      <td><strong>Newman</strong></td>
+      <td>Postman's official command-line runner (needs Node.js). <em>The old version of our project used it;
+      the new one replaced it</em> — see section 7.</td>
+    </tr>
+  </table>
+  <div class="callout">
+    <strong>Key point:</strong> our project does <em>not</em> need the Postman app open. It just reads the
+    exported collection <code>.json</code> file and runs the requests itself.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="what">3. What this project does</h2>
+  <p>For every request in a collection it produces a verdict using <strong>two layers of judgement</strong>,
+  and <strong>the worse of the two wins</strong>:</p>
+  <div class="grid">
+    <div class="card">
+      <h3 style="margin-top:0">Layer 1 — Deterministic checks</h3>
+      <p class="muted">Always run. 100% reliable. No AI needed.</p>
+      <ul class="tight">
+        <li>Status ≥ 500 → <span class="tag-fail">FAIL</span></li>
+        <li>Status ≥ 400 → <span class="tag-fail">FAIL</span></li>
+        <li>Response slower than 2000ms → <span class="tag-warn">WARN</span></li>
+        <li>Connection/transport error → <span class="tag-fail">FAIL</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Layer 2 — AI verdict</h3>
+      <p class="muted">The nuance a rule can't catch.</p>
+      <ul class="tight">
+        <li>Leaked secrets / API keys in the body</li>
+        <li>Stack traces or error messages</li>
+        <li>Missing or contradictory fields</li>
+        <li>Malformed payloads, security smells</li>
+        <li>A one-line plain-English summary</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout good">
+    <strong>Why two layers?</strong> Even if the AI is turned off or unavailable, you still get a useful,
+    reliable report from Layer 1. The AI only ever <em>adds</em> insight — it can't break the basics.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="how">4. How it works (the engine)</h2>
+  <p>The whole project is built around one small shared core (in <code>backend/core/</code>). Three files:</p>
+  <table>
+    <tr><th>File</th><th>Job</th></tr>
+    <tr>
+      <td><code>runner.py</code></td>
+      <td>A <strong>native Python</strong> collection runner. Parses the collection JSON, fills in
+      <code>{{variables}}</code>, sends each request with the <code>httpx</code> library, and records what came back.
+      Capped at 50 requests for safety. <em>It deliberately does not run Postman's own test scripts — the AI does the testing.</em></td>
+    </tr>
+    <tr>
+      <td><code>analyze.py</code></td>
+      <td>The orchestrator. Runs the collection, applies the deterministic checks, asks the AI for a verdict
+      (up to 4 requests analyzed in parallel for speed), merges the two, and builds the summary
+      (totals, pass/fail counts, average latency).</td>
+    </tr>
+    <tr>
+      <td><code>llm.py</code></td>
+      <td>The <strong>pluggable AI backend</strong>. Talks to three providers over plain HTTP and normalizes
+      every answer into <code>{status, severity, anomalies, summary}</code>:
+      <ul class="tight">
+        <li><strong>Ollama</strong> — runs locally on your machine, free, no API key (the default)</li>
+        <li><strong>Gemini</strong> — Google's cloud model (needs a key)</li>
+        <li><strong>Claude</strong> — Anthropic's cloud model (needs a key)</li>
+      </ul>
+      </td>
+    </tr>
+  </table>
+  <div class="callout">
+    <strong>Stateless by design:</strong> nothing is ever written to a disk or database. The same core code runs
+    identically on your laptop, inside the MCP server, and in a Docker container.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="mcp">5. What is MCP — and how we built our own</h2>
+
+  <h3>What is MCP?</h3>
+  <p>
+    <strong>MCP (Model Context Protocol)</strong> is an open standard that lets AI assistants (like Claude Desktop)
+    safely call external <em>tools</em>. Think of it as a <strong>USB port for AI</strong>: instead of the AI only
+    being able to chat, MCP lets it plug into real programs and <em>do things</em> — run code, read files, query a
+    database. An "MCP server" is just a program that exposes a few functions ("tools") in the shape MCP expects,
+    and any MCP-compatible AI client can then discover and call them.
+  </p>
+
+  <h3>How we made this project an MCP server</h3>
+  <p>
+    We used the official <code>mcp</code> Python library (its <code>FastMCP</code> helper). Turning a normal Python
+    function into an AI-callable tool is remarkably little code — you create a server and mark functions with a
+    <code>@mcp.tool()</code> decorator. That's the whole trick. Here is the actual file (<code>mcp_server/server.py</code>), trimmed:
+  </p>
+<pre><code>from mcp.server.fastmcp import FastMCP
+from backend.core import llm
+from backend.core.analyze import analyze_collection
+
+mcp = FastMCP("Postman AI Runner")      # 1. create the server
+
+@mcp.tool()                              # 2. expose a function as a tool
+def list_llm_providers() -> str:
+    """List available LLM providers and models."""
+    return json.dumps(llm.available_providers())
+
+@mcp.tool()                              # 3. the main tool
+def run_postman_collection(collection_path: str, provider="", model="",
+                           use_llm=True, max_requests=50) -> str:
+    """Run a Postman collection and return an AI QA report."""
+    collection = json.loads(Path(collection_path).read_text())
+    report = analyze_collection(collection, provider or None, ...)
+    return json.dumps(report)
+
+if __name__ == "__main__":
+    mcp.run()                            # 4. start listening</code></pre>
+  <p>Notice the two important design choices:</p>
+  <ul class="tight">
+    <li><strong>The MCP server reuses the exact same core</strong> (<code>analyze_collection</code>) as the website
+    and the API. We didn't duplicate any logic — MCP is just a thin wrapper.</li>
+    <li><strong>The function's docstring becomes the tool's description.</strong> That's how the AI knows what the
+    tool does and what arguments to pass. Good docstrings = the AI uses the tool correctly.</li>
+  </ul>
+
+  <h3>How it's actually used</h3>
+  <p>You register the server once in your MCP client's config (e.g. Claude Desktop's
+  <code>claude_desktop_config.json</code>), pointing it at this file:</p>
+<pre><code>{
+  "mcpServers": {
+    "postman-ai-runner": {
+      "command": "/ABS/PATH/backend/.venv/bin/python",
+      "args": ["-m", "mcp_server.server"],
+      "cwd": "/ABS/PATH/mcp-postman-ai-runner"
+    }
+  }
+}</code></pre>
+  <p>After that, you can simply tell the AI in plain English:</p>
+  <div class="callout">
+    <em>"Run the Postman collection at <code>/path/to/collection.json</code> and analyze it."</em>
+  </div>
+  <p>The AI recognizes it has a matching tool (<code>run_postman_collection</code>), calls it with the right path,
+  and reads back the report — all without you touching a terminal.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="faces">6. The three ways to use it</h2>
+  <p>One shared engine, three "faces" on top of it:</p>
+  <table>
+    <tr><th>Face</th><th>Who it's for</th><th>Folder</th></tr>
+    <tr><td><strong>Web dashboard</strong></td><td>Humans — upload a collection, see a color-coded report</td><td><code>frontend/</code> (React + Tailwind)</td></tr>
+    <tr><td><strong>REST API</strong></td><td>Other programs / automation</td><td><code>backend/api/</code> (FastAPI)</td></tr>
+    <tr><td><strong>MCP server</strong></td><td>AI assistants like Claude Desktop</td><td><code>mcp_server/</code></td></tr>
+  </table>
+  <p class="muted">The REST API has two endpoints: <code>GET /api/info</code> (lists providers &amp; installed
+  Ollama models) and <code>POST /api/run</code> (runs a collection and returns the report).</p>
+
+  <!-- ============================================================ -->
+  <h2 id="diff">7. Old prototype vs this rebuild</h2>
+  <p>The folder <code>MCPPostman/mcp-postman-analyzer</code> is the original prototype. This project is a
+  ground-up rebuild of the same idea. What changed:</p>
+  <table>
+    <tr><th></th><th>Old — mcp-postman-analyzer</th><th>New — mcp-postman-ai-runner</th></tr>
+    <tr><td><strong>Runs collections via</strong></td><td>Newman (needs Node.js) + temp files</td><td>Native Python + <code>httpx</code>, no Node, no temp files</td></tr>
+    <tr><td><strong>AI providers</strong></td><td>Ollama only, one hardcoded model</td><td>Pluggable: Ollama / Gemini / Claude, pick per run</td></tr>
+    <tr><td><strong>Interfaces</strong></td><td>MCP server only</td><td>MCP server + web dashboard + REST API</td></tr>
+    <tr><td><strong>Safety checks</strong></td><td>None — fully trusts the AI</td><td>Deterministic checks always run; AI is a bonus</td></tr>
+    <tr><td><strong>User interface</strong></td><td>None</td><td>React + Tailwind dashboard</td></tr>
+    <tr><td><strong>Deployment</strong></td><td>Local only</td><td>Dockerized; frontend → GitHub Pages, backend → Hugging Face</td></tr>
+    <tr><td><strong>State</strong></td><td>Writes temp files</td><td>Fully stateless</td></tr>
+  </table>
+  <div class="callout good">
+    <strong>One-sentence version:</strong> we took the original Newman/Node-dependent, Ollama-only, MCP-only
+    prototype and rebuilt it as a self-contained Python engine with a pluggable AI backend, deterministic safety
+    checks, and a web dashboard — so it's portable, hostable, and works with or without an LLM.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="run">8. How to start it</h2>
+
+  <h3>Prerequisite (for local AI): Ollama</h3>
+  <p>The default AI runs locally through <a style="color:var(--accent)" href="https://ollama.com">Ollama</a>.
+  Make sure it's running (<code>ollama serve</code>) with at least one model pulled. The app auto-detects it and
+  picks the first installed model — no API key needed.</p>
+
+  <h3>Step 1 — Backend (Python 3.10+)</h3>
+<pre><code>cd backend
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+cd .. && uvicorn backend.main:app --reload --port 8000</code></pre>
+  <p class="muted">The API is now live at <code>http://localhost:8000</code>. Check it with <code>http://localhost:8000/api/info</code>.</p>
+
+  <h3>Step 2 — Frontend (the dashboard)</h3>
+<pre><code>cd frontend && npm install && npm run dev</code></pre>
+  <p class="muted">Open <code>http://localhost:5173</code> in your browser.</p>
+
+  <h3>Step 3 (optional) — Run as an MCP server</h3>
+<pre><code>python -m mcp_server.server</code></pre>
+  <p class="muted">…or register it in Claude Desktop using the config shown in section 5.</p>
+
+  <h3>Optional configuration (environment variables)</h3>
+  <div class="kv">
+    <div>MCP_PROVIDER</div><div>Default provider: <code>ollama</code> / <code>gemini</code> / <code>claude</code></div>
+    <div>OLLAMA_MODEL</div><div>Force a specific Ollama model (else the first installed one)</div>
+    <div>GEMINI_API_KEY</div><div>Enables the Gemini provider</div>
+    <div>ANTHROPIC_API_KEY</div><div>Enables the Claude provider</div>
+  </div>
+
+  <h3>Run the tests</h3>
+<pre><code>source backend/.venv/bin/activate &amp;&amp; python -m pytest backend/tests -q</code></pre>
+
+  <div class="callout warn" style="margin-top:24px">
+    <strong>Demo tip:</strong> the backend (port 8000) must be started before the dashboard can run anything.
+    If your machine has <code>qwen3.5</code> or <code>gemma</code> pulled in Ollama instead of <code>llama3.1</code>,
+    that's fine — the app just uses whichever model is installed.
+  </div>
+
+  <footer>
+    Generated project guide · MCP Postman AI Runner · A shared Python core exposed three ways: web dashboard, REST API, and an MCP server.
+  </footer>
+
+</div>
+</body>
+</html>
