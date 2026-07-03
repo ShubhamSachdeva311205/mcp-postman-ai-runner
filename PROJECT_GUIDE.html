@@ -121,8 +121,9 @@
       <a href="#how">4. How it works (the engine)</a>
       <a href="#mcp">5. What is MCP + how we built our own</a>
       <a href="#faces">6. The three ways to use it</a>
-      <a href="#diff">7. Old prototype vs this rebuild</a>
-      <a href="#run">8. How to start it</a>
+      <a href="#files">7. Every file, explained (the map)</a>
+      <a href="#diff">8. Old prototype vs this rebuild</a>
+      <a href="#run">9. How to start it</a>
     </div>
   </div>
 
@@ -326,7 +327,57 @@ if __name__ == "__main__":
   Ollama models) and <code>POST /api/run</code> (runs a collection and returns the report).</p>
 
   <!-- ============================================================ -->
-  <h2 id="diff">7. Old prototype vs this rebuild</h2>
+  <h2 id="files">7. Every file, explained (the map)</h2>
+  <p>Here's the whole project top to bottom, one line per file — enough to know what each thing is
+  without reading the code.</p>
+
+  <h3>📁 backend/ — the Python brain</h3>
+  <table>
+    <tr><th>File</th><th>What it is</th></tr>
+    <tr><td><code>main.py</code></td><td>App entry point. Creates the FastAPI app, wires up CORS, and mounts the API routes.</td></tr>
+    <tr><td><code>requirements.txt</code></td><td>The Python dependencies (FastAPI, uvicorn, httpx, pydantic, mcp, pytest).</td></tr>
+    <tr><td><code>api/endpoints.py</code></td><td>The two web endpoints: <code>/api/info</code> and <code>/api/run</code>. Validates input, calls the core, returns JSON.</td></tr>
+    <tr><td><code>core/runner.py</code></td><td>The native Postman runner — parses the collection, fills variables, sends the requests.</td></tr>
+    <tr><td><code>core/analyze.py</code></td><td>The orchestrator — runs the collection, applies deterministic checks + AI, merges into a report.</td></tr>
+    <tr><td><code>core/llm.py</code></td><td>The pluggable AI backend — talks to Ollama / Gemini / Claude and normalizes the verdict.</td></tr>
+    <tr><td><code>tests/test_core.py</code></td><td>Automated tests for the core logic (8 of them, all passing).</td></tr>
+    <tr><td><code>tests/sample_collection.json</code></td><td>A tiny example Postman collection used for tests and the one-click demo.</td></tr>
+  </table>
+
+  <h3>📁 mcp_server/ — the AI-tool wrapper</h3>
+  <table>
+    <tr><td><code>server.py</code></td><td>Exposes the same engine as MCP tools (<code>run_postman_collection</code>, <code>list_llm_providers</code>) for Claude Desktop &amp; other AI clients.</td></tr>
+  </table>
+
+  <h3>📁 frontend/ — the web dashboard (React + TypeScript)</h3>
+  <table>
+    <tr><td><code>index.html</code> / <code>src/main.tsx</code></td><td>The page shell and the React entry point that boots the app.</td></tr>
+    <tr><td><code>src/App.tsx</code></td><td>The main screen — lays out the input panel, controls, and results; talks to the backend.</td></tr>
+    <tr><td><code>src/api/client.ts</code></td><td>The functions that call the backend (<code>getInfo</code>, <code>runCollection</code>).</td></tr>
+    <tr><td><code>src/components/CollectionInput.tsx</code></td><td>Upload / drag-drop / paste a collection — <strong>and the new one-click "Use sample test collection" button</strong>.</td></tr>
+    <tr><td><code>src/components/RunnerControls.tsx</code></td><td>Pick the AI provider &amp; model, toggle the LLM, and the Run button.</td></tr>
+    <tr><td><code>src/components/ResultsView.tsx</code></td><td>Renders the report — the PASS/WARN/FAIL cards, anomalies, and summary.</td></tr>
+    <tr><td><code>src/components/ui/*</code></td><td>Small reusable UI building blocks (button, card, input, label).</td></tr>
+    <tr><td><code>tailwind.config.js</code> / <code>vite.config.ts</code> / <code>tsconfig*.json</code></td><td>Styling and build configuration — you rarely touch these.</td></tr>
+    <tr><td><code>package.json</code></td><td>The frontend's dependencies and scripts (<code>npm run dev</code>, <code>npm run build</code>).</td></tr>
+  </table>
+
+  <h3>📁 Project root — config, deploy &amp; docs</h3>
+  <table>
+    <tr><td><code>README.md</code></td><td>The short technical readme.</td></tr>
+    <tr><td><code>PROJECT_GUIDE.html</code></td><td>This guide you're reading.</td></tr>
+    <tr><td><code>Dockerfile</code> / <code>.dockerignore</code></td><td>Recipe to package the backend into a container for hosting.</td></tr>
+    <tr><td><code>DEPLOY.md</code> / <code>deploy/</code></td><td>Notes and scripts for hosting (frontend on GitHub Pages, backend on Hugging Face).</td></tr>
+    <tr><td><code>.github/workflows/</code></td><td>GitHub Actions — auto-deploys the frontend to GitHub Pages on push.</td></tr>
+    <tr><td><code>docs/</code></td><td>Screenshots used in the readme.</td></tr>
+  </table>
+  <div class="callout good">
+    <strong>Mental model:</strong> everything funnels into the 3 files in <code>backend/core/</code>. The
+    <code>frontend/</code>, <code>api/</code>, and <code>mcp_server/</code> are just three different doors into that same room.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="diff">8. Old prototype vs this rebuild</h2>
   <p>The folder <code>MCPPostman/mcp-postman-analyzer</code> is the original prototype. This project is a
   ground-up rebuild of the same idea. What changed:</p>
   <table>
@@ -346,7 +397,7 @@ if __name__ == "__main__":
   </div>
 
   <!-- ============================================================ -->
-  <h2 id="run">8. How to start it</h2>
+  <h2 id="run">9. How to start it</h2>
 
   <h3>Prerequisite (for local AI): Ollama</h3>
   <p>The default AI runs locally through <a style="color:var(--accent)" href="https://ollama.com">Ollama</a>.

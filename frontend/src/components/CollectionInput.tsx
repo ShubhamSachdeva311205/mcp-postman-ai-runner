@@ -96,6 +96,15 @@ export function CollectionInput({ parsed, onParsed }: Props) {
         <span className="text-xs text-ink-faint">v2.1 JSON · or paste below</span>
       </button>
 
+      <button
+        type="button"
+        onClick={() => accept(JSON.stringify(SAMPLE))}
+        className="flex w-full items-center justify-center gap-2 rounded-md border border-primary/40 bg-primary/10 px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
+      >
+        <FlaskConical className="h-4 w-4" strokeWidth={1.75} /> Use sample test collection
+      </button>
+      <p className="text-center text-[11px] text-ink-faint">one click — no file needed</p>
+
       <textarea
         onChange={(e) => e.target.value.trim() && accept(e.target.value)}
         placeholder="…or paste collection JSON here"
@@ -103,16 +112,7 @@ export function CollectionInput({ parsed, onParsed }: Props) {
         className="h-20 w-full resize-y rounded-md border border-input bg-bg px-3 py-2 font-mono text-xs text-ink placeholder:text-ink-faint/60 focus-visible:border-primary/60 focus-visible:outline-none"
       />
 
-      <div className="flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => accept(JSON.stringify(SAMPLE))}
-          className="inline-flex items-center gap-1.5 text-xs text-primary transition-colors hover:underline"
-        >
-          <FlaskConical className="h-3.5 w-3.5" /> Load sample collection
-        </button>
-        {error && <span className="truncate text-xs text-fail">{error}</span>}
-      </div>
+      {error && <span className="block truncate text-xs text-fail">{error}</span>}
     </div>
   )
 }

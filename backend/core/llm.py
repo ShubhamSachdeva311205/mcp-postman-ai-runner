@@ -145,11 +145,15 @@ def analyze(tx: dict[str, Any], provider: str | None = None, model: str | None =
 
 
 def _call_ollama(prompt: str, model: str, timeout: float) -> str:
+    # think=False keeps "thinking" models (qwen3, gemma3, etc.) from putting their
+    # answer in a separate `thinking` field and leaving `response` empty. We fall
+    # back to `thinking` too, in case a model ignores the flag.
     body = {"model": model, "prompt": prompt, "stream": False,
-            "format": "json", "options": {"temperature": 0}}
+            "format": "json", "think": False, "options": {"temperature": 0}}
     r = httpx.post(f"{OLLAMA_URL}/api/generate", json=body, timeout=timeout)
     r.raise_for_status()
-    return r.json().get("response", "")
+    data = r.json()
+    return data.get("response", "") or data.get("thinking", "")
 
 
 def _call_gemini(prompt: str, model: str, timeout: float) -> str:
